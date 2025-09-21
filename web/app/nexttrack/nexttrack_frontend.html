@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextTrack - Privacy-First Music Recommendations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a'
+                        },
+                        accent: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .slider-track {
+            background: linear-gradient(to right, #e5e7eb 0%, #e5e7eb var(--value), #d1d5db var(--value), #d1d5db 100%);
+        }
+        .slider-thumb {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        .gradient-border {
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            padding: 2px;
+            border-radius: 12px;
+        }
+        .gradient-border-inner {
+            background: white;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">NextTrack</h1>
+                        <p class="text-sm text-slate-600">Privacy-first music discovery</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-slate-600">
+                    <svg class="w-4 h-4 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    <span>No tracking • Stateless • Private</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Left Column: Track Input -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Track Input Section -->
+                <div class="gradient-border">
+                    <div class="gradient-border-inner p-6">
+                        <h2 class="text-xl font-semibold text-slate-900 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Your Track Sequence
+                        </h2>
+                        <p class="text-slate-600 mb-6">Enter the songs you've been listening to. NextTrack will recommend what to play next based on this sequence.</p>
+                        
+                        <div id="track-list" class="space-y-3 mb-4">
+                            <!-- Track inputs will be dynamically added here -->
+                        </div>
+                        
+                        <button id="add-track" class="flex items-center space-x-2 text-primary-600 hover:text-primary-700 font-medium transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <span>Add another track</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-lg border border-slate-200 p-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-4">Advanced Filters</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Year Range</label>
+                            <div class="flex space-x-2">
+                                <input type="number" placeholder="1960" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <span class="text-slate-500 self-center">to</span>
+                                <input type="number" placeholder="2024" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Exclude Artists</label>
+                            <input type="text" placeholder="Artist names (comma separated)" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center">
+                        <input type="checkbox" id="exclude-explicit" class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                        <label for="exclude-explicit" class="ml-2 text-sm text-slate-700">Exclude explicit content</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Preferences -->
+            <div class="space-y-6">
+                <!-- Recommendation Preferences -->
+                <div class="bg-white/70 backdrop-blur-sm rounded-lg border border-slate-200 p-6">
+                    <h2 class="text-xl font-semibold text-slate-900 mb-6 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                        </svg>
+                        Preferences
+                    </h2>
+
+                    <div class="space-y-6">
+                        <!-- Mood Slider -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-medium text-slate-700">Mood</label>
+                                <span id="mood-value" class="text-sm text-slate-500">0.5</span>
+                            </div>
+                            <input type="range" id="mood-slider" min="0" max="1" step="0.1" value="0.5" 
+                                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-track">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>Melancholy</span>
+                                <span>Uplifting</span>
+                            </div>
+                        </div>
+
+                        <!-- Energy Slider -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-medium text-slate-700">Energy</label>
+                                <span id="energy-value" class="text-sm text-slate-500">0.5</span>
+                            </div>
+                            <input type="range" id="energy-slider" min="0" max="1" step="0.1" value="0.5" 
+                                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>Chill</span>
+                                <span>High Energy</span>
+                            </div>
+                        </div>
+
+                        <!-- Obscurity Slider -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-medium text-slate-700">Discovery Level</label>
+                                <span id="obscurity-value" class="text-sm text-slate-500">0.5</span>
+                            </div>
+                            <input type="range" id="obscurity-slider" min="0" max="1" step="0.1" value="0.5" 
+                                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>Popular Hits</span>
+                                <span>Hidden Gems</span>
+                            </div>
+                        </div>
+
+                        <!-- Tempo Variance Slider -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-medium text-slate-700">Tempo Variance</label>
+                                <span id="tempo-value" class="text-sm text-slate-500">0.3</span>
+                            </div>
+                            <input type="range" id="tempo-slider" min="0" max="1" step="0.1" value="0.3" 
+                                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>Similar Tempo</span>
+                                <span>Mix It Up</span>
+                            </div>
+                        </div>
+
+                        <!-- Lyrical Coherence Slider -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-medium text-slate-700">Lyrical Coherence</label>
+                                <span id="lyrical-value" class="text-sm text-slate-500">0.5</span>
+                            </div>
+                            <input type="range" id="lyrical-slider" min="0" max="1" step="0.1" value="0.5" 
+                                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>Theme Variety</span>
+                                <span>Consistent Theme</span>
+                            </div>
+                        </div>
+
+                        <!-- Toggle Options -->
+                        <div class="space-y-3 pt-4 border-t border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <label class="text-sm font-medium text-slate-700">Artist Diversity</label>
+                                <div class="relative">
+                                    <input type="checkbox" id="artist-diversity" checked class="sr-only">
+                                    <div class="toggle-bg w-10 h-6 bg-slate-200 rounded-full shadow-inner cursor-pointer transition-colors duration-200"></div>
+                                    <div class="toggle-dot absolute w-4 h-4 bg-white rounded-full shadow left-1 top-1 transition-transform duration-200"></div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500">Avoid repeating the same artists</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendation Button -->
+                <button id="get-recommendation" class="w-full bg-gradient-to-r from-primary-600 to-accent-500 text-white font-semibold py-4 px-6 rounded-lg hover:from-primary-700 hover:to-accent-600 transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <div class="flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Get Recommendation</span>
+                    </div>
+                </button>
+
+                <!-- Preset Buttons -->
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-slate-700">Quick Presets</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="preset-btn px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" data-preset="discovery">
+                            🔍 Discovery Mode
+                        </button>
+                        <button class="preset-btn px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" data-preset="chill">
+                            😌 Chill Vibes
+                        </button>
+                        <button class="preset-btn px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" data-preset="energy">
+                            ⚡ High Energy
+                        </button>
+                        <button class="preset-btn px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors" data-preset="hits">
+                            🎵 Popular Hits
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendation Result -->
+        <div id="recommendation-result" class="mt-8 hidden">
+            <div class="bg-white/80 backdrop-blur-sm rounded-lg border border-slate-200 p-6">
+                <h2 class="text-xl font-semibold text-slate-900 mb-4">Your Next Track</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-slate-200 to-slate-300 rounded-lg flex items-center justify-center">
+                                <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-lg text-slate-900">Track Name</h3>
+                                <p class="text-slate-600">Artist Name</p>
+                                <p class="text-sm text-slate-500">Album Name • Year</p>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span class="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">Rock</span>
+                                    <span class="px-2 py-1 bg-accent-100 text-accent-700 text-xs rounded-full">Alternative</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <h4 class="font-medium text-slate-900">Why this track?</h4>
+                        <div class="space-y-2 text-sm text-slate-600">
+                            <div class="flex justify-between">
+                                <span>Audio Similarity</span>
+                                <span class="font-medium">87%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Lyrical Match</span>
+                                <span class="font-medium">72%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Discovery Score</span>
+                                <span class="font-medium">91%</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 italic">
+                            "Recommended for similar energy and progressive elements while maintaining classic rock continuity"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Track management
+        let trackCount = 0;
+
+        function createTrackInput(index) {
+            return `
+                <div class="track-input-group flex items-center space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors" data-index="${index}">
+                    <div class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-sm font-medium">
+                        ${index + 1}
+                    </div>
+                    <input type="text" 
+                           placeholder="Track Name - Artist (e.g., Bohemian Rhapsody - Queen)" 
+                           class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white">
+                    ${index > 0 ? '<button class="remove-track w-8 h-8 text-slate-400 hover:text-red-500 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>' : ''}
+                </div>
+            `;
+        }
+
+        function addTrack() {
+            const trackList = document.getElementById('track-list');
+            trackList.insertAdjacentHTML('beforeend', createTrackInput(trackCount));
+            trackCount++;
+            
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-track').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.target.closest('.track-input-group').remove();
+                    renumberTracks();
+                });
+            });
+        }
+
+        function renumberTracks() {
+            document.querySelectorAll('.track-input-group').forEach((group, index) => {
+                const numberDiv = group.querySelector('.bg-primary-100');
+                numberDiv.textContent = index + 1;
+                group.dataset.index = index;
+            });
+            trackCount = document.querySelectorAll('.track-input-group').length;
+        }
+
+        // Initialize with first track
+        addTrack();
+
+        // Add track button
+        document.getElementById('add-track').addEventListener('click', addTrack);
+
+        // Slider value updates
+        const sliders = [
+            { id: 'mood-slider', valueId: 'mood-value' },
+            { id: 'energy-slider', valueId: 'energy-value' },
+            { id: 'obscurity-slider', valueId: 'obscurity-value' },
+            { id: 'tempo-slider', valueId: 'tempo-value' },
+            { id: 'lyrical-slider', valueId: 'lyrical-value' }
+        ];
+
+        sliders.forEach(({ id, valueId }) => {
+            const slider = document.getElementById(id);
+            const valueDisplay = document.getElementById(valueId);
+            
+            slider.addEventListener('input', (e) => {
+                valueDisplay.textContent = e.target.value;
+            });
+        });
+
+        // Toggle switch
+        const toggle = document.getElementById('artist-diversity');
+        const toggleBg = document.querySelector('.toggle-bg');
+        const toggleDot = document.querySelector('.toggle-dot');
+
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                toggleBg.classList.add('bg-primary-500');
+                toggleBg.classList.remove('bg-slate-200');
+                toggleDot.classList.add('translate-x-4');
+            } else {
+                toggleBg.classList.remove('bg-primary-500');
+                toggleBg.classList.add('bg-slate-200');
+                toggleDot.classList.remove('translate-x-4');
+            }
+        });
+
+        // Initialize toggle
+        toggle.dispatchEvent(new Event('change'));
+
+        // Preset configurations
+        const presets = {
+            discovery: { mood: 0.5, energy: 0.6, obscurity: 0.8, tempo: 0.4, lyrical: 0.3 },
+            chill: { mood: 0.3, energy: 0.2, obscurity: 0.5, tempo: 0.2, lyrical: 0.7 },
+            energy: { mood: 0.8, energy: 0.9, obscurity: 0.4, tempo: 0.7, lyrical: 0.4 },
+            hits: { mood: 0.7, energy: 0.7, obscurity: 0.2, tempo: 0.5, lyrical: 0.5 }
+        };
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const preset = presets[e.target.dataset.preset];
+                
+                document.getElementById('mood-slider').value = preset.mood;
+                document.getElementById('energy-slider').value = preset.energy;
+                document.getElementById('obscurity-slider').value = preset.obscurity;
+                document.getElementById('tempo-slider').value = preset.tempo;
+                document.getElementById('lyrical-slider').value = preset.lyrical;
+                
+                // Update value displays
+                sliders.forEach(({ id, valueId }) => {
+                    const slider = document.getElementById(id);
+                    const valueDisplay = document.getElementById(valueId);
+                    valueDisplay.textContent = slider.value;
+                });
+
+                // Visual feedback
+                btn.classList.add('bg-primary-500', 'text-white');
+                setTimeout(() => {
+                    btn.classList.remove('bg-primary-500', 'text-white');
+                }, 200);
+            });
+        });
+
+        // Get recommendation button
+        document.getElementById('get-recommendation').addEventListener('click', () => {
+            // Validate input
+            const tracks = Array.from(document.querySelectorAll('.track-input-group input'))
+                .map(input => input.value.trim())
+                .filter(value => value.length > 0);
+
+            if (tracks.length === 0) {
+                alert('Please enter at least one track!');
+                return;
+            }
+
+            // Collect preferences
+            const preferences = {
+                mood: parseFloat(document.getElementById('mood-slider').value),
+                energy: parseFloat(document.getElementById('energy-slider').value),
+                obscurity: parseFloat(document.getElementById('obscurity-slider').value),
+                tempo_variance: parseFloat(document.getElementById('tempo-slider').value),
+                lyrical_coherence: parseFloat(document.getElementById('lyrical-slider').value),
+                artist_diversity: document.getElementById('artist-diversity').checked
+            };
+
+            // Show loading state
+            const btn = document.getElementById('get-recommendation');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="flex items-center justify-center space-x-2"><svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Finding your next track...</span></div>';
+            btn.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                // Show result
+                document.getElementById('recommendation-result').classList.remove('hidden');
+                document.getElementById('recommendation-result').scrollIntoView({ behavior: 'smooth' });
+                
+                // Reset button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
+
+            console.log('Recommendation request:', { tracks, preferences });
+        });
+    </script>
+</body>
+</html>

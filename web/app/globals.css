@@ -1,0 +1,72 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+/* Custom slider styles */
+@layer utilities {
+  .slider-track {
+    background: linear-gradient(
+      to right,
+      #e5e7eb 0%,
+      #e5e7eb var(--value),
+      #d1d5db var(--value),
+      #d1d5db 100%
+    );
+  }
+
+  .slider-thumb {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  }
+
+  .gradient-border {
+    background: linear-gradient(135deg, #3b82f6, #10b981);
+    padding: 2px;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px 0 rgba(59, 130, 246, 0.1),
+      0 1.5px 6px 0 rgba(16, 185, 129, 0.08);
+  }
+
+  .gradient-border-inner {
+    @apply bg-white;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px 0 rgba(30, 58, 138, 0.06);
+  }
+
+  .main-action-btn {
+    background: linear-gradient(90deg, #2563eb 0%, #10b981 100%);
+    box-shadow: 0 4px 16px 0 rgba(59, 130, 246, 0.15),
+      0 1.5px 6px 0 rgba(16, 185, 129, 0.1);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  }
+
+  .main-action-btn:active {
+    transform: scale(0.98);
+  }
+
+  .toggle-bg {
+    transition: background 0.2s;
+  }
+
+  .toggle-dot {
+    transition: transform 0.2s;
+  }
+
+  .toggle-bg.on {
+    background: linear-gradient(90deg, #2563eb 0%, #10b981 100%);
+  }
+
+  .toggle-dot.on {
+    transform: translateX(1.25rem);
+    box-shadow: 0 2px 8px 0 rgba(59, 130, 246, 0.15);
+  }
+
+  .input-focus {
+    @apply focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    box-shadow: 0 0 0 2px #3b82f6;
+    transition: box-shadow 0.2s;
+  }
+
+  .section-title {
+    @apply font-bold text-lg;
+    letter-spacing: -0.01em;
+  }
+}
